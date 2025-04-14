@@ -82,15 +82,6 @@ app.post('/auth/login', async (req, res) => {
   }
 });
 
-app.get('/users', async (req, res) => {
-  try {
-    const allUsers = await Owner.find();
-    res.status(200).json(allUsers);
-  } catch (error) {
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
 //middleware to validate jwt token for protected routes
 const verifyJWT = (req, res, next) => {
   //checks req headers has authorization or not
@@ -138,8 +129,17 @@ app.get('/auth/me', verifyJWT, async (req, res) => {
   }
 });
 
+app.get('/users', verifyJWT, async (req, res) => {
+  try {
+    const allUsers = await Owner.find();
+    res.status(200).json(allUsers);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 //team
-app.post('/teams', async (req, res) => {
+app.post('/teams', verifyJWT, async (req, res) => {
   const { name, description } = req.body;
   try {
     const newTeam = new Team({ name, description });
@@ -150,7 +150,7 @@ app.post('/teams', async (req, res) => {
   }
 });
 
-app.get('/teams', async (req, res) => {
+app.get('/teams', verifyJWT, async (req, res) => {
   try {
     const allTeams = await Team.find();
     res.status(200).json(allTeams);
@@ -160,7 +160,7 @@ app.get('/teams', async (req, res) => {
 });
 
 //project
-app.post('/projects', async (req, res) => {
+app.post('/projects', verifyJWT, async (req, res) => {
   const { name, description } = req.body;
   try {
     const newProject = new Project({ name, description });
@@ -181,7 +181,7 @@ app.get('/projects', verifyJWT, async (req, res) => {
 });
 
 //tag
-app.post('/tags', async (req, res) => {
+app.post('/tags', verifyJWT, async (req, res) => {
   const { name } = req.body;
   try {
     const newTag = new ProjectTag({ name });
@@ -192,7 +192,7 @@ app.post('/tags', async (req, res) => {
   }
 });
 
-app.get('/tags', async (req, res) => {
+app.get('/tags', verifyJWT, async (req, res) => {
   try {
     const allTags = await ProjectTag.find();
     res.status(200).json(allTags);
@@ -202,7 +202,7 @@ app.get('/tags', async (req, res) => {
 });
 
 //task
-app.post('/tasks', async (req, res) => {
+app.post('/tasks', verifyJWT, async (req, res) => {
   const { name, project, team, owners, tags, timeToComplete, status } =
     req.body;
   console.log(name, project, team, owners, tags, timeToComplete, status);
@@ -224,7 +224,7 @@ app.post('/tasks', async (req, res) => {
   }
 });
 
-app.get('/tasks', async (req, res) => {
+app.get('/tasks', verifyJWT, async (req, res) => {
   const { name, project, team, owners, tags, status } = req.query;
   try {
     // console.log(name, project, team, owners, tags, status);
@@ -257,7 +257,7 @@ app.get('/tasks', async (req, res) => {
   }
 });
 
-app.put('/tasks/:id', async (req, res) => {
+app.put('/tasks/:id', verifyJWT, async (req, res) => {
   const taskId = req.params.id;
   const dataToUpdate = req.body;
   try {
@@ -278,7 +278,7 @@ app.put('/tasks/:id', async (req, res) => {
   }
 });
 
-app.delete('/tasks/:id', async (req, res) => {
+app.delete('/tasks/:id', verifyJWT, async (req, res) => {
   const taskId = req.params.id;
   try {
     const deleteTask = await Task.findByIdAndDelete(taskId);
@@ -296,7 +296,7 @@ app.delete('/tasks/:id', async (req, res) => {
 });
 
 //reporting
-app.get('/report/last-week-completed', async (req, res) => {
+app.get('/report/last-week-completed', verifyJWT, async (req, res) => {
   try {
     const completedTasks = await Task.find({ status: 'Completed' });
 
@@ -336,7 +336,7 @@ app.get('/report/last-week-completed', async (req, res) => {
 //   }
 // });
 
-app.get('/report/pending', async (req, res) => {
+app.get('/report/pending', verifyJWT, async (req, res) => {
   try {
     const allTasks = await Task.find();
     const pendingWork = allTasks.reduce(
@@ -357,7 +357,7 @@ app.get('/report/pending', async (req, res) => {
   }
 });
 
-app.get('/report/closed-by-team', async (req, res) => {
+app.get('/report/closed-by-team', verifyJWT, async (req, res) => {
   try {
     const completedTasks = await Task.find({ status: 'Completed' }).populate(
       'team'
@@ -374,7 +374,7 @@ app.get('/report/closed-by-team', async (req, res) => {
   }
 });
 
-app.get('/report/closed-by-owner', async (req, res) => {
+app.get('/report/closed-by-owner', verifyJWT, async (req, res) => {
   try {
     const completedTasks = await Task.find({ status: 'Completed' }).populate(
       'owners'
