@@ -15,11 +15,15 @@ const Task = require('./models/task.model');
 const app = express();
 
 const corsOptions = {
-  origin: '*',
+  origin: ["'http://localhost:5173'"],
+  credentials: true,
   optionSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
+
+app.options('*', cors()); // respond to preflight
+
 app.use(express.json());
 
 initializeDatabase();
