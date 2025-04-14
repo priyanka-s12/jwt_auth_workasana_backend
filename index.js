@@ -15,7 +15,7 @@ const Task = require('./models/task.model');
 const app = express();
 
 const corsOptions = {
-  origin: '*',
+  origin: true,
   credentials: true,
   optionSuccessStatus: 200,
 };
