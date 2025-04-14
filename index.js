@@ -171,7 +171,7 @@ app.post('/projects', async (req, res) => {
   }
 });
 
-app.get('/projects', async (req, res) => {
+app.get('/projects', verifyJWT, async (req, res) => {
   try {
     const allProjects = await Project.find();
     res.status(200).json(allProjects);
